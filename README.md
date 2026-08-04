@@ -25,7 +25,7 @@ Once compiled, you can launch the solver.
 
 **Example Command:**
 ```bash
-./puzzlesolver --range 400000000000000000:7fffffffffffffffff -target f6f5431d25bbf7b12e8add9af5e3475c44a0a5b8
+./puzzlesolver -r 400000000000000000:7fffffffffffffffff -target f6f5431d25bbf7b12e8add9af5e3475c44a0a5b8
 ```
 
 ---
@@ -34,7 +34,7 @@ Once compiled, you can launch the solver.
 
 The tool provides extensive options to tune the search to your exact hardware and target requirements:
 
-- `-r` or `--range <min:max>`
+- `-r`  `<min:max>`
   **Description:** Defines the specific hex key range to scan. 
   *Example:* `--range 400000000000000000:7fffffffffffffffff`
 
@@ -42,13 +42,13 @@ The tool provides extensive options to tune the search to your exact hardware an
   **Description:** Sets a custom target RIPEMD160 hash to hunt for. Must be a 40-character hex string.
   *Example:* `-target f6f5431d25bbf7b12e8add9af5e3475c44a0a5b8`
 
-- `-s` or `--sequential`
+- `-s`
   **Description:** Runs the search sequentially starting from the minimum range. By default, the tool searches randomly.
 
-- `-t` or `--threads <num>`
+- `-t`
   **Description:** Sets the number of CPU threads to use. (Only applicable when compiled/running in CPU mode).
 
-- `-b` or `--batch <num>`
+- `-b`
   **Description:** Sets the batch size per thread. (Default is 4096 for CPU, 1024 for GPU).
 
 
