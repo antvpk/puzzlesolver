@@ -51,11 +51,6 @@ The tool provides extensive options to tune the search to your exact hardware an
 - `-b` or `--batch <num>`
   **Description:** Sets the batch size per thread. (Default is 4096 for CPU, 1024 for GPU).
 
-- `--blocks <num>`
-  **Description:** Sets the CUDA block count manually. Leave as `0` for auto-tuning (GPU mode only).
-
-- `--tpb <num>`
-  **Description:** Sets the Threads Per Block manually. Leave as `0` for auto-tuning (GPU mode only).
 
 ---
 
