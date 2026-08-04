@@ -868,8 +868,8 @@ int main(int argc, char **argv) {
                blocks, threads_per_block, blocks * threads_per_block);
     }
 
-    printf("[*] GPU Mode | Blocks: %d | Threads/Block: %d | Batch: %d | SharedTable: %d\n\n", 
-           blocks, threads_per_block, GPU_BATCH_SIZE, GPU_SHARED_TABLE);
+    printf("[*] GPU Mode | Mode: %s | Blocks: %d | Threads/Block: %d | Batch: %d | SharedTable: %d\n\n", 
+           random_mode ? "Random" : "Sequential", blocks, threads_per_block, GPU_BATCH_SIZE, GPU_SHARED_TABLE);
     
     // Use device memory for found flags (not managed — faster)
     int *d_found_flag;
