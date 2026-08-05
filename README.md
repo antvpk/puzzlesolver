@@ -40,21 +40,22 @@ Once compiled, you can launch the solver.
 The tool provides extensive options to tune the search to your exact hardware and target requirements:
 
 - `-r`  `<min:max>`
-  **Description:** Defines the specific hex key range to scan. 
+   Defines the specific hex key range to scan. 
   *Example:* `--range 400000000000000000:7fffffffffffffffff`
 
 - `-target <hash>`
-  **Description:** Sets a custom target RIPEMD160 hash to hunt for. Must be a 40-character hex string.
+   Sets a custom target RIPEMD160 hash to hunt for. Must be a 40-character hex string.
+  
   *Example:* `-target f6f5431d25bbf7b12e8add9af5e3475c44a0a5b8`
 
 - `-s`
-  **Description:** Runs the search sequentially starting from the minimum range. By default, the tool searches randomly.
+   Runs the search sequentially starting from the minimum range. By default, the tool searches randomly.
 
 - `-t`
-  **Description:** Sets the number of CPU threads to use. (Only applicable when compiled/running in CPU mode).
+   Sets the number of CPU threads to use. (Only applicable when compiled/running in CPU mode).
 
 - `-b`
-  **Description:** Sets the batch size per thread. (Default is 4096 for CPU, 1024 for GPU).
+   Sets the batch size per thread. (Default is 4096 for CPU, 1024 for GPU).
 
 
 ---
