@@ -54,7 +54,6 @@ The tool provides extensive options to tune the search to your exact hardware an
 
 ---
 
-
 ---
 
 ## 🚀 100% NVIDIA GPU Support
@@ -79,3 +78,13 @@ When a matching key is found, the application halts immediately and logs the res
 - The private key in standard hex format
 - The Wallet Import Format (WIF) compressed key
 - The associated legacy compressed Bitcoin address
+
+---
+
+## 📝 Changelog
+
+**v2.1:**
+- fixed sequential boundary bug (tool now properly stops at `RANGE_MAX`).
+
+**v2.0:**
+- initial release.
