@@ -9,6 +9,7 @@
 #include <thread>
 #include <mutex>
 #include <signal.h>
+#include <random>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -563,22 +564,16 @@ static uint256_t random_start_in_range() {
     while (bits >= 0 && u256_get_bit(diff, bits) == 0) bits--;
     if (bits < 0) return RANGE_MIN;
     
+    thread_local std::random_device rd;
+    thread_local std::mt19937_64 gen(rd());
+    std::uniform_int_distribution<uint64_t> dist(0, 0xFFFFFFFFFFFFFFFFULL);
+    
     uint256_t r;
-    FILE *f = fopen("/dev/urandom", "rb");
     while (true) {
-        if (f) {
-            unsigned char buf[32];
-            if (fread(buf, 1, 32, f) != 32) { fclose(f); f = NULL; continue; }
-            r.d[0] = ((uint64_t)buf[7] << 56) | ((uint64_t)buf[6] << 48) | ((uint64_t)buf[5] << 40) | ((uint64_t)buf[4] << 32) | ((uint64_t)buf[3] << 24) | ((uint64_t)buf[2] << 16) | ((uint64_t)buf[1] << 8) | buf[0];
-            r.d[1] = ((uint64_t)buf[15] << 56) | ((uint64_t)buf[14] << 48) | ((uint64_t)buf[13] << 40) | ((uint64_t)buf[12] << 32) | ((uint64_t)buf[11] << 24) | ((uint64_t)buf[10] << 16) | ((uint64_t)buf[9] << 8) | buf[8];
-            r.d[2] = ((uint64_t)buf[23] << 56) | ((uint64_t)buf[22] << 48) | ((uint64_t)buf[21] << 40) | ((uint64_t)buf[20] << 32) | ((uint64_t)buf[19] << 24) | ((uint64_t)buf[18] << 16) | ((uint64_t)buf[17] << 8) | buf[16];
-            r.d[3] = ((uint64_t)buf[31] << 56) | ((uint64_t)buf[30] << 48) | ((uint64_t)buf[29] << 40) | ((uint64_t)buf[28] << 32) | ((uint64_t)buf[27] << 24) | ((uint64_t)buf[26] << 16) | ((uint64_t)buf[25] << 8) | buf[24];
-        } else {
-            r.d[0] = ((uint64_t)rand() << 32) | rand();
-            r.d[1] = ((uint64_t)rand() << 32) | rand();
-            r.d[2] = ((uint64_t)rand() << 32) | rand();
-            r.d[3] = ((uint64_t)rand() << 32) | rand();
-        }
+        r.d[0] = dist(gen);
+        r.d[1] = dist(gen);
+        r.d[2] = dist(gen);
+        r.d[3] = dist(gen);
         
         int limb = bits / 64;
         int bit_in_limb = bits % 64;
@@ -590,7 +585,6 @@ static uint256_t random_start_in_range() {
         
         if (u256_cmp(r, diff) <= 0) break;
     }
-    if (f) fclose(f);
     
     u256_add(r, r, RANGE_MIN);
     return r;
