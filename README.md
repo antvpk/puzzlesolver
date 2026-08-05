@@ -23,7 +23,12 @@ make gpu
 ### 2. Running the Solver
 Once compiled, you can launch the solver.
 
-**Example Command:**
+**For default puzzle target:**
+```bash
+./puzzlesolver
+```
+
+**For custom range and target:**
 ```bash
 ./puzzlesolver -r 400000000000000000:7fffffffffffffffff -target f6f5431d25bbf7b12e8add9af5e3475c44a0a5b8
 ```
