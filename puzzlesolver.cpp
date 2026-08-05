@@ -764,11 +764,24 @@ int main(int argc, char **argv) {
         }
         if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
 #ifdef __CUDACC__
-            printf("Usage: %s [-s] [-b N] [--blocks N] [--tpb N] [-target HASH] [-r MIN:MAX] [-h]\n", argv[0]);
-            printf("  --blocks 0  = auto-detect optimal blocks from GPU\n");
-            printf("  --tpb 0     = auto-detect optimal threads/block from GPU\n");
+            printf("Usage: %s [-s] [-b N] [--blocks N] [--tpb N] [-target HASH] [-r MIN:MAX] [-h]\n\n", argv[0]);
+            printf("Options:\n");
+            printf("  -s, --sequential  Run in sequential mode (starts at MIN, stops at MAX). Default is random mode.\n");
+            printf("  -b, --batch N     Set the batch size for affine inversions (default: 1024).\n");
+            printf("  -target HASH      Specify the target RIPEMD-160 hash (40 hex characters).\n");
+            printf("  -r, --range M:X   Set the search range from MIN to MAX in hex (e.g., -r 400000000:7ffffffff).\n");
+            printf("  --blocks N        Set number of GPU blocks (0 = auto-detect optimal blocks).\n");
+            printf("  --tpb N           Set threads per block (0 = auto-detect optimal threads/block).\n");
+            printf("  -h, --help        Show this help message and exit.\n");
 #else
-            printf("Usage: %s [-t N] [-s] [-b N] [-target HASH] [-r MIN:MAX] [-h]\n", argv[0]);
+            printf("Usage: %s [-t N] [-s] [-b N] [-target HASH] [-r MIN:MAX] [-h]\n\n", argv[0]);
+            printf("Options:\n");
+            printf("  -t, --threads N   Set number of CPU threads to use (default: auto-detect).\n");
+            printf("  -s, --sequential  Run in sequential mode (starts at MIN, stops at MAX). Default is random mode.\n");
+            printf("  -b, --batch N     Set the batch size for affine inversions (default: 4096).\n");
+            printf("  -target HASH      Specify the target RIPEMD-160 hash (40 hex characters).\n");
+            printf("  -r, --range M:X   Set the search range from MIN to MAX in hex (e.g., -r 400000000:7ffffffff).\n");
+            printf("  -h, --help        Show this help message and exit.\n");
 #endif
             return 0;
         }
@@ -785,7 +798,7 @@ int main(int argc, char **argv) {
     u256_to_hex(max_hex_str, RANGE_MAX);
     
     printf("╔═══════════════════════════════════════════════════════╗\n");
-    printf("║  🔑 Puzzle Keyhunt v2.0 - Ultra Performance CPU/GPU  ║\n");
+    printf("║  🔑 Puzzle Keyhunt v2.1 - Ultra Performance CPU/GPU  ║\n");
     printf("║  Target: %-44s ║\n", target_hex_str);
     char *min_p = min_hex_str;
     while (*min_p == '0' && *(min_p+1) != '\0') min_p++;
@@ -889,6 +902,10 @@ int main(int argc, char **argv) {
             start = RANGE_MIN;
             uint64_t offset = (uint64_t)(round - 1) * blocks * threads_per_block * keys_per_thread;
             u256_add64(start, start, offset);
+            
+            if (u256_cmp(start, RANGE_MAX) > 0) {
+                break;
+            }
         }
         
         // Launch on alternating streams
@@ -936,6 +953,16 @@ int main(int argc, char **argv) {
 
     while (g_running.load() && !g_found.load()) {
         round++;
+        
+        if (!random_mode) {
+            uint256_t round_start = RANGE_MIN;
+            uint64_t offset = (uint64_t)(round - 1) * num_threads * keys_per_thread;
+            u256_add64(round_start, round_start, offset);
+            if (u256_cmp(round_start, RANGE_MAX) > 0) {
+                break;
+            }
+        }
+
 #ifdef _OPENMP
         omp_set_num_threads(num_threads);
         #pragma omp parallel
@@ -956,7 +983,10 @@ int main(int argc, char **argv) {
                                   (uint64_t)(round - 1) * num_threads * keys_per_thread;
                 u256_add64(start, start, offset);
             }
-            search_worker(start, keys_per_thread);
+            
+            if (random_mode || u256_cmp(start, RANGE_MAX) <= 0) {
+                search_worker(start, keys_per_thread);
+            }
         }
     }
 #endif
@@ -971,7 +1001,7 @@ int main(int argc, char **argv) {
     printf("\n\n[📊] Total: %llu (%.2e) in %.1fs | Avg: %.2f Mkeys/s | %s\n",
            (unsigned long long)total, (double)total, total_time,
            total / total_time / 1e6,
-           g_found.load() ? "FOUND ✅" : "Not found ❌");
+           g_found.load() ? "FOUND ✅" : "Not found ❌ (Range fully searched)");
 
     return g_found.load() ? 0 : 1;
 }
