@@ -97,7 +97,7 @@ gpu: puzzlesolver.cpp
 	rm -f puzzlesolver.cu
 	@echo ""
 	@echo "[✓] GPU build complete: ./$(TARGET)"
-	@echo "[*] Run with: ./$(TARGET) --blocks 0 --tpb 0   (auto-tune)"
+	@echo "[*] Run with: ./$(TARGET)"
 
 # Explicit arch targets for convenience
 gpu-pascal: CUDA_ARCH = sm_61
